@@ -1,0 +1,73 @@
+if(`window -ex PathDuplicateWin1`)
+{deleteUI PathDuplicateWin1;}
+
+window -title "PathDuplicate" PathDuplicateWin1;
+columnLayout -adjustableColumn true;
+intSliderGrp -label"Number" -field true -min 2 -max 100 PDWIS;
+button -label "Accept" -command"LinkProc";
+button -label "RainColor" -command"rainColor()";
+showWindow PathDuplicateWin1;
+
+global proc LinkProc()
+{
+    int $num=`intSliderGrp -q -v PDWIS`;
+    pathAnimationDup $num; 
+}
+
+//-------------Proc Path Duplicate-----------------
+global proc pathAnimationDup(int $numbersOfDuplication)
+{
+//objects
+string $sel[]=`ls -sl`;
+//AnimationPath
+pathAnimation 
+-fractionMode true 
+-follow true 
+-followAxis x 
+-upAxis y 
+-worldUpType "vector" 
+-worldUpVector 0 1 0 
+-inverseUp false 
+-inverseFront false 
+-bank false 
+-startTimeU 1 
+-endTimeU $numbersOfDuplication;
+
+//for Duplicate
+for($i=0;$i<30;$i++)
+{
+    currentTime($i+1);
+    duplicate -rr $sel[0];
+}
+//delete orginal objects
+delete $sel;
+select -cl;
+}
+
+//-------------Proc RainColor-----------------
+global proc rainColor()
+{
+string $sel[]=`ls -sl`;
+float $f=0;
+for($objects in $sel)
+{
+$f=$f+1.0/size($sel);
+//Create Shader
+string $shaderName=`shadingNode -asShader blinn`;
+string $shaderNameSG=`sets -renderable true -noSurfaceShader true -empty -name ($shaderName+"SG")`;
+connectAttr -f ($shaderName+".outColor") ($shaderNameSG+".surfaceShader");
+
+//Create RemapHsv
+string $HsvName=`shadingNode -asUtility remapHsv`;
+
+//Connect Attr
+connectAttr -force ($HsvName+".outColor") ($shaderName+".color");
+
+//Assign Shader
+select -r $objects;
+sets -e -forceElement $shaderNameSG;
+//Modify Color
+setAttr ($HsvName+".color") -type double3 1.0 0.156 0.346322;
+setAttr ($HsvName+".hue[1].hue_FloatValue") $f;
+}
+}

@@ -1,0 +1,35 @@
+if(`window -ex myWin`)
+{deleteUI myWin;}
+window 
+-menuBar true
+-t "非常的厉害！"
+-wh 600 550
+myWin;
+menu -label "File" -tearOff true;
+    menuItem -label "New File" -command "file -f -new";
+    menuItem -divider true;
+    menuItem -label "Quit" -command "deleteUI myWin";
+menu -label "About" -tearOff true;
+    menuItem -label "About Me" -command"aboutMe";
+columnLayout -adjustableColumn true;
+text -l "\n There are many useful and practical functions here!\n";
+floatSliderGrp -label "半径"-field true -min 0.1 -max 20.0 flsgp;
+button -l "小球" -c"mySphere";
+button -l "盒子" -c"polyCube";
+button -l "圆柱" -c"polyCylinder";
+button -l "圆环" -c"polyTorus";
+window -e -wh 600 550 myWin;
+showWindow myWin;
+
+
+global proc mySphere()
+{
+    float $radiusOfSphere=`floatSliderGrp -q -v flsgp`;
+    polySphere -radius $radiusOfSphere;
+}
+global proc aboutMe()
+{
+    confirmDialog -title"GG's Plugins v1.0.1"
+    -message "This is not for comercial \n Thank you very much!"
+    -button "OK";
+}

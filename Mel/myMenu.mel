@@ -1,0 +1,22 @@
+if(`menu -ex myNewMainMenu`)
+{
+    deleteUI -menu myNewMainMenu;
+}
+//Create Menus
+global string $gMainWindow;
+setParent $gMainWindow;
+menu -label "GG" myNewMainMenu;
+//Adding Menu Items
+setParent -menu myNewMainMenu;
+//-subMenu 细分菜单
+menuItem -label "GG_first" -command"source GG_first.mel";
+menuItem -label "CurveDuplicate" -command"source \"C:/Users/Admin/Documents/maya/2017/scripts/CurveDuplicate.mel\"";
+menuItem -subMenu true -tearOff true -label "NewPlugs" myMakeMeAMenu;
+    //子菜单
+    menuItem -label"rainColor" -command "source \"C:/Users/Admin/Documents/maya/2017/scripts/rainColor.mel\"";
+    menuItem -label"GG_render" -command "source \"C:/Users/Admin/Documents/maya/2017/scripts/GG_render.mel\"";
+    menuItem -label"PolySphere" -command polySphere;
+setParent -menu ..; //.. 回到上一层
+menuItem -divider true;
+menuItem -label"yes" -command"";
+menuItem -label"no" -command"";

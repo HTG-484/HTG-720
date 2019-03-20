@@ -1,0 +1,67 @@
+if(`window -ex NBRenderWin`){deleteUI NBRenderWin;}
+window -title "«∞Ã®‰÷»æΩ≈±æNBRender For Maya"
+NBRenderWin;
+columnLayout;
+text -l "Start frame";
+intField inf1;
+text -l "End frame";
+intField inf2;
+string $cameraNames[]=`listTransforms -cameras`;
+optionMenu -label "Camera" a;
+	for($i=0;$i<size($cameraNames);$i++)
+		{menuItem -label $cameraNames[$i];}
+                       
+text -l "Path for Render Images";
+textField -w 300 inf3;
+text -l "Name";  
+textField inf4;
+button -l "Render" -c "linkOfNBRender";
+showWindow NBRenderWin; 
+window -e -wh 500 300 NBRenderWin;
+
+
+global proc NBRender(int $start,int $end,string $path
+,string $name,string $camera
+)
+{
+for($i=$start;$i<=$end;$i++)
+{
+  int $amount = 0;
+
+     progressWindow
+         -title "Rendering"
+         -progress $amount
+         -status "Frame: 0%"
+         -isInterruptable true;
+
+
+         if ( `progressWindow -query -isCancelled` ) break;
+
+         if ( `progressWindow -query -progress` >= $end ) break;
+
+         $amount = $i;
+
+         progressWindow -edit
+             -progress $amount
+             -status ("Frame: "+$amount+"/"+$end);
+
+currentTime $i ;
+RenderViewWindow;
+renderWindowRenderCamera("render","renderView",$camera);
+renderWindowSaveImageCallback 
+"renderView"  
+($path+$name+($i)) "Maya IFF";}
+  progressWindow -endProgress;
+}
+
+
+
+global proc linkOfNBRender()
+{
+$start =`intField -q -v inf1`;
+$end =`intField -q -v inf2`;
+string $path =`textField -q -tx inf3`;
+string $name =`textField -q -tx inf4`;
+NBRender($start,$end,$path
+,$name,`optionMenu -q -v a`
+);}

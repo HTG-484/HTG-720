@@ -1,0 +1,27 @@
+global proc rainColor()
+{
+string $sel[]=`ls -sl`;
+float $f=0;
+for($objects in $sel)
+{
+$f=$f+1.0/size($sel);
+//Create Shader
+string $shaderName=`shadingNode -asShader blinn`;
+string $shaderNameSG=`sets -renderable true -noSurfaceShader true -empty -name ($shaderName+"SG")`;
+connectAttr -f ($shaderName+".outColor") ($shaderNameSG+".surfaceShader");
+
+//Create RemapHsv
+string $HsvName=`shadingNode -asUtility remapHsv`;
+
+//Connect Attr
+connectAttr -force ($HsvName+".outColor") ($shaderName+".color");
+
+//Assign Shader
+select -r $objects;
+sets -e -forceElement $shaderNameSG;
+//Modify Color
+setAttr ($HsvName+".color") -type double3 1.0 0.156 0.346322;
+setAttr ($HsvName+".hue[1].hue_FloatValue") $f;
+}
+}
+rainColor();
